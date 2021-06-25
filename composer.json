@@ -2,6 +2,7 @@
     "name": "maleficarum/worker",
     "description": "Worker component",
     "license": "proprietary",
+    "minimum-stability": "dev",
     "require": {
         "php": "^7.2",
         "ext-json": "*",
@@ -11,7 +12,8 @@
         "maleficarum/profiler": "^5.0",
         "maleficarum/handler": "^4.0",
         "maleficarum/rabbitmq": "dev-feature-context-tracker as 12.0",
-        "maleficarum/command": "^5.0"
+        "maleficarum/command": "^5.0",
+        "maleficarum/contexttracker": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.3"
@@ -29,7 +31,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@github.com:pharaun13/maleficarum-context-tracker.git"
+            "url": "https://github.com/MMalawski2/maleficarum-rabbitmq.git"
         }
     ]
 }

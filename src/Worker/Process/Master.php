@@ -5,6 +5,9 @@
 
 namespace Maleficarum\Worker\Process;
 
+use Maleficarum\ContextTracing\Carrier\Amqp\AmqpHeader;
+use Maleficarum\ContextTracing\ContextTracker;
+
 class Master {
     /* ------------------------------------ Class Traits START ----------------------------------------- */
     
@@ -233,6 +236,7 @@ class Master {
     public function handleCommand(\PhpAmqpLib\Message\AMQPMessage $message) {
         try {
             $headers = $message->has('application_headers') ? $message->get('application_headers')->getNativeData() : [];
+            (new AmqpHeader())->extract(ContextTracker::getTracer(), $headers);
             $command = \Maleficarum\Command\AbstractCommand::decode($message->body, $headers);
         } catch (\Throwable $t) {
             $this->getLogger()->log('[' . $this->name . '] Received command of unknown structure (NOT JSON). [content: '.$message->body.']', 'PHP Worker Error');
