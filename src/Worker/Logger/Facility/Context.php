@@ -14,7 +14,7 @@ class Context extends Syslog
             $data['context'] = array_merge($data['context'] ?? [], ContextTracker::getTracer()->flatten());
         }
         if(is_string($data)) {
-            $data = 'Context: ' . implode(', ', ContextTracker::getTracer()->flatten());
+            $data .= 'Context: ' . implode(', ', ContextTracker::getTracer()->flatten());
         }
 
         parent::write($data, $level);
