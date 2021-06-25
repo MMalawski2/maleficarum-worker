@@ -6,7 +6,7 @@ namespace Maleficarum\Worker\Logger\Facility;
 
 use Maleficarum\ContextTracing\ContextTracker;
 
-class ContextSyslog extends Syslog
+class Context extends Syslog
 {
     public function write($data, string $level): \Maleficarum\Worker\Logger\Facility\Facility
     {
