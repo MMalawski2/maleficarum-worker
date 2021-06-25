@@ -13,8 +13,8 @@ class Context extends Syslog
         if (is_array($data)) {
             $data['context'] = array_merge($data['context'] ?? [], ContextTracker::getTracer()->flatten());
         }
-        if(is_string($data)) {
-            $data .= 'Context: ' . implode(', ', ContextTracker::getTracer()->flatten());
+        if (is_string($data)) {
+            $data .= 'Context: ' . json_encode(ContextTracker::getTracer()->flatten());
         }
 
         parent::write($data, $level);
