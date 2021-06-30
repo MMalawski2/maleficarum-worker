@@ -5,6 +5,8 @@
 
 namespace Maleficarum\Worker\Logger;
 
+use Maleficarum\Worker\Logger\Processor\Processor;
+
 class Logger {
     /**
      * Internal storage for assigned facilities.
@@ -13,12 +15,18 @@ class Logger {
      */
     private $facilities = null;
 
+    /**
+     * @var array|Processor[]
+     */
+    private $processors = [];
+
     /* ------------------------------------ Magic methods START ---------------------------------------- */
     /**
      * Initialize a new logger without any facilities.
      */
     public function __construct() {
         $this->facilities = [];
+        $this->processors = [];
     }
     /* ------------------------------------ Magic methods END ------------------------------------------ */
 
@@ -37,11 +45,20 @@ class Logger {
             throw new \InvalidArgumentException('Incorrect debug level provided - string expected. \Maleficarum\Worker\Logger\Logger');
         }
 
+        foreach ($this->processors as $processor) {
+            $data = $processor->process($data);
+        }
+
         foreach ($this->facilities as $facility) {
             $facility->write($data, $level);
         }
 
         return $this;
+    }
+
+    public function attachProcessor(Processor $processor)
+    {
+        $this->processors[] = $processor;
     }
 
     /**

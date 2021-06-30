@@ -10,6 +10,7 @@ declare (strict_types=1);
 
 namespace Maleficarum\Worker\Basic;
 
+use Maleficarum\Worker\Logger\Processor\Processor;
 use function foo\func;
 
 class Builder {
@@ -107,6 +108,14 @@ class Builder {
             }
 
             $logger = (new \Maleficarum\Worker\Logger\Logger());
+            if (isset($dep['Maleficarum\Config']['logger']['processors'])) {
+                foreach ($dep['Maleficarum\Config']['logger']['processors'] as $processorClass) {
+                    /** @var Processor $processorObject */
+                    $processorObject = \Maleficarum\Ioc\Container::get($processorClass);
+
+                    $logger->attachProcessor($processorObject);
+                }
+            }
             foreach ($dep['Maleficarum\Config']['logger']['facilities'] as $class) {
                 $class = 'Maleficarum\Worker\Logger\Facility\\' . ucfirst($class);
                 $facility = \Maleficarum\Ioc\Container::get($class);
