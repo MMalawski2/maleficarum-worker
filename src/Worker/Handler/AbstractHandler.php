@@ -87,7 +87,7 @@ abstract class AbstractHandler {
     public function log(string $message): \Maleficarum\Worker\Handler\AbstractHandler {
         $this
             ->getLogger()
-            ->log('['.$this->getWorkerId().'] '.'['.$this->getHandlerId().'] '.'['.$this->getMemoryUsage().'] '.$message, 'PHP Worker Info');
+            ->log('['.$this->getWorkerId().'] '.'['.$this->getMemoryUsage().'] '.$message, 'PHP Worker Info');
 
         return $this;
     }
