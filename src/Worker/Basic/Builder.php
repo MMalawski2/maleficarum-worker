@@ -22,6 +22,10 @@ class Builder {
         'logger'
     ];
 
+    const defaultProcessors = [
+        '\Maleficarum\Worker\Logger\Processor\ContextProcessor'
+    ];
+
     /* ------------------------------------ Class Constant END ----------------------------------------- */
 
     /* ------------------------------------ Class Methods START ---------------------------------------- */
@@ -108,6 +112,12 @@ class Builder {
             }
 
             $logger = (new \Maleficarum\Worker\Logger\Logger());
+            foreach(self::defaultProcessors as $defaultProcessor) {
+                /** @var Processor $processorObject */
+                $processorObject = \Maleficarum\Ioc\Container::get($defaultProcessor);
+
+                $logger->attachProcessor($processorObject);
+            }
             if (isset($dep['Maleficarum\Config']['logger']['processors'])) {
                 foreach ($dep['Maleficarum\Config']['logger']['processors'] as $processorClass) {
                     /** @var Processor $processorObject */
