@@ -5,6 +5,7 @@ namespace Maleficarum\Worker\Logger\Processor;
 
 
 use Maleficarum\ContextTracing\ContextTracker;
+use Maleficarum\ContextTracing\Logger\Formatter;
 
 class ContextProcessor implements Processor
 {
@@ -13,12 +14,9 @@ class ContextProcessor implements Processor
      */
     public function process($data)
     {
-        if (is_array($data)) {
-            $data['context'] = array_merge($data['context'] ?? [], ContextTracker::getTracer()->flatten());
-        }
-        if (is_string($data)) {
-            $data .= 'Context: ' . json_encode(ContextTracker::getTracer()->flatten());
-        }
+        $flatContext = ContextTracker::getTracer()->flatten();
+
+        $data['message'] = Formatter::format($data['message'], $flatContext);
 
         return $data;
     }
