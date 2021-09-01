@@ -5,6 +5,7 @@ This is the Maleficarum Worker component implementation.
 ### Added
 - Worker logger processor feature 
 - Default logger processor that adds context tracking
+- Automatic context tracking receiver
 - Dependency to context tracking library
 
 ## [13.1.0] - 2021-01-29
