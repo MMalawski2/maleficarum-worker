@@ -16,7 +16,12 @@ class ContextProcessor implements Processor
     {
         $flatContext = ContextTracker::getTracer()->flatten();
 
-        $data['message'] = Formatter::format($data['message'], $flatContext);
+        if(is_string($data)) {
+            $data = Formatter::format($data, $flatContext);
+        }
+        if(is_array($data)) {
+            $data['message'] = Formatter::format($data['message'], $flatContext);
+        }
 
         return $data;
     }
