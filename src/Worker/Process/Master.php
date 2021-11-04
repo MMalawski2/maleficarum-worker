@@ -8,6 +8,8 @@ namespace Maleficarum\Worker\Process;
 use Maleficarum\ContextTracing\Carrier\Amqp\AmqpHeader;
 use Maleficarum\ContextTracing\Carrier\Amqp\AmqpInitializer;
 use Maleficarum\ContextTracing\ContextTracker;
+use Maleficarum\Worker\Extractor\ContextTrackerHeaderExtractor;
+use Maleficarum\Worker\Extractor\HeaderExtractor;
 
 class Master {
     /* ------------------------------------ Class Traits START ----------------------------------------- */
@@ -56,6 +58,11 @@ class Master {
      * @var int 
      */
     private $multi_mode_wait_period = 100000;
+
+    /**
+     * @var HeaderExtractor[]
+     */
+    private $extractors = [];
 
     /* ------------------------------------ Class Methods START ---------------------------------------- */
     
@@ -237,7 +244,7 @@ class Master {
     public function handleCommand(\PhpAmqpLib\Message\AMQPMessage $message) {
         try {
             $headers = $message->has('application_headers') ? $message->get('application_headers')->getNativeData() : [];
-            AmqpInitializer::initialize($headers, 'worker');
+            $this->extractHeaders($headers);
             $command = \Maleficarum\Command\AbstractCommand::decode($message->body, $headers);
         } catch (\Throwable $t) {
             $this->getLogger()->log('[' . $this->name . '] Received command of unknown structure (NOT JSON). [content: '.$message->body.']', 'PHP Worker Error');
@@ -282,4 +289,29 @@ class Master {
         \socket_set_option($socket, \SOL_SOCKET, \SO_KEEPALIVE, 1);
     }
     /* ------------------------------------ Class Methods END ------------------------------------------ */
+    /**
+     * @param array<string, string> $headers
+     */
+    protected function extractHeaders(array $headers): void
+    {
+        foreach ($this->getHeaderExtractors() as $extractor) {
+            $extractor->extract($headers);
+        }
+    }
+
+    /**
+     * @return HeaderExtractor[]
+     */
+    protected function getHeaderExtractors(): array
+    {
+        return array_merge($this->extractors, $this->getDefaultExtractors());
+    }
+
+    /**
+     * @return HeaderExtractor[]
+     */
+    protected function getDefaultExtractors(): array
+    {
+        return [new ContextTrackerHeaderExtractor()];
+    }
 }
