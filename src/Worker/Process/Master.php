@@ -5,8 +5,8 @@
 
 namespace Maleficarum\Worker\Process;
 
-use Maleficarum\Worker\Extractor\ContextTrackerHeaderExtractor;
-use Maleficarum\Worker\Extractor\HeaderExtractor;
+use Maleficarum\Worker\Middleware\ContextTrackerMessageMiddleware;
+use Maleficarum\Worker\Middleware\MessageMiddleware;
 
 class Master {
     /* ------------------------------------ Class Traits START ----------------------------------------- */
@@ -57,9 +57,9 @@ class Master {
     private $multi_mode_wait_period = 100000;
 
     /**
-     * @var HeaderExtractor[]
+     * @var MessageMiddleware[]
      */
-    private $extractors = [];
+    private $middlewares = [];
 
     /* ------------------------------------ Class Methods START ---------------------------------------- */
     
@@ -241,7 +241,7 @@ class Master {
     public function handleCommand(\PhpAmqpLib\Message\AMQPMessage $message) {
         try {
             $headers = $message->has('application_headers') ? $message->get('application_headers')->getNativeData() : [];
-            $this->extractHeaders($headers);
+            $this->processMiddleware($message);
             $command = \Maleficarum\Command\AbstractCommand::decode($message->body, $headers);
         } catch (\Throwable $t) {
             $this->getLogger()->log('[' . $this->name . '] Received command of unknown structure (NOT JSON). [content: '.$message->body.']', 'PHP Worker Error');
@@ -289,31 +289,31 @@ class Master {
     /**
      * @param array<string, string> $headers
      */
-    protected function extractHeaders(array $headers): void
+    protected function processMiddleware(\PhpAmqpLib\Message\AMQPMessage $message): void
     {
-        foreach ($this->getHeaderExtractors() as $extractor) {
-            $extractor->extract($headers);
+        foreach ($this->getMessageMiddlewares() as $middleware) {
+            $middleware->extract($message);
         }
     }
 
     /**
-     * @return HeaderExtractor[]
+     * @return MessageMiddleware[]
      */
-    protected function getHeaderExtractors(): array
+    protected function getMessageMiddlewares(): array
     {
-        return array_merge($this->extractors, $this->getDefaultExtractors());
+        return array_merge($this->middlewares, $this->getDefaultMiddlewares());
     }
 
     /**
-     * @return HeaderExtractor[]
+     * @return MessageMiddleware[]
      */
-    protected function getDefaultExtractors(): array
+    protected function getDefaultMiddlewares(): array
     {
-        return [new ContextTrackerHeaderExtractor()];
+        return [new ContextTrackerMessageMiddleware()];
     }
 
-    public function addHeaderExtractor(HeaderExtractor $extractor): void
+    public function addMiddleware(MessageMiddleware $extractor): void
     {
-        $this->extractors[] = $extractor;
+        $this->middlewares[] = $extractor;
     }
 }
