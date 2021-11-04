@@ -5,9 +5,6 @@
 
 namespace Maleficarum\Worker\Process;
 
-use Maleficarum\ContextTracing\Carrier\Amqp\AmqpHeader;
-use Maleficarum\ContextTracing\Carrier\Amqp\AmqpInitializer;
-use Maleficarum\ContextTracing\ContextTracker;
 use Maleficarum\Worker\Extractor\ContextTrackerHeaderExtractor;
 use Maleficarum\Worker\Extractor\HeaderExtractor;
 
@@ -313,5 +310,10 @@ class Master {
     protected function getDefaultExtractors(): array
     {
         return [new ContextTrackerHeaderExtractor()];
+    }
+
+    public function addHeaderExtractor(HeaderExtractor $extractor): void
+    {
+        $this->extractors[] = $extractor;
     }
 }
