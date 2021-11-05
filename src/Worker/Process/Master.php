@@ -292,7 +292,7 @@ class Master {
     protected function processMiddleware(\PhpAmqpLib\Message\AMQPMessage $message): void
     {
         foreach ($this->getMessageMiddlewares() as $middleware) {
-            $middleware->extract($message);
+            $middleware->process($message);
         }
     }
 

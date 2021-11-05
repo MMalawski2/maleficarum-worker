@@ -6,5 +6,5 @@ namespace Maleficarum\Worker\Middleware;
 
 interface MessageMiddleware
 {
-    public function extract(\PhpAmqpLib\Message\AMQPMessage $message): void;
+    public function process(\PhpAmqpLib\Message\AMQPMessage $message): void;
 }
