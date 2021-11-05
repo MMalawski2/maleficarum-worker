@@ -203,3 +203,11 @@ Each of the message has automatically added an information about the execution t
 ## [1.0.0] - 2017-01-10
 ### Added
 - This was an initial release based on the code written by pharaun13 and added to the repo by me
+
+
+##Usage
+
+###Middleware
+
+Allows to process messages before any processors and wrappers are initialized. Use Manager::addMiddleware() method to register middleware E.g. 
+check for context tracing headers
